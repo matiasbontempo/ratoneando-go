@@ -1,0 +1,6 @@
+/tmp
+
+.env
+.env.production
+
+.air.toml
