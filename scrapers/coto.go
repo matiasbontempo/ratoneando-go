@@ -8,12 +8,27 @@ import (
 	"ratoneando/utils/numbers"
 )
 
-func extractor(element *html.ElementWrapper, doc *html.DocumentWrapper) product.ExtendedSchema {
+func coalesce(strs ...string) string {
+	for _, str := range strs {
+		if str != "" {
+			return str
+		}
+	}
+	return ""
+}
+
+func extractor(element *html.ElementWrapper, doc *html.DocumentWrapper) products.ExtendedSchema {
 	id, _ := element.Attr("id")
 	id = strings.Replace(id, "li_prod", "", -1)
 
 	name := element.Find("div.descrip_full").Text()
-	rawPrice := element.Find(".info_discount span.atg_store_newPrice").Text()
+
+	// rawPrice := coalesce(element.Find(".price_discount").Text(), element.Find(".info_discount span.atg_store_newPrice").Text())
+	rawPrice := coalesce(
+		element.Find(".price_regular_precio").Text(),
+		element.Find("span.atg_store_newPrice").First().Text(),
+	)
+
 	price, _ := numbers.ParseMoney(rawPrice)
 
 	link, _ := element.Find("a").Attr("href")

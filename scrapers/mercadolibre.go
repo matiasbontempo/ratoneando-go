@@ -4,6 +4,7 @@ import (
 	"ratoneando/cores/html"
 	"ratoneando/products"
 	"strconv"
+	"strings"
 )
 
 func MercadoLibre(query string) ([]products.Schema, error) {
@@ -18,12 +19,13 @@ func MercadoLibre(query string) ([]products.Schema, error) {
 		Extractor: func(element *html.ElementWrapper, doc *html.DocumentWrapper) products.ExtendedSchema {
 			id, _ := element.Attr("id")
 			name := element.Find("h2.ui-search-item__title").Text()
-			price, _ := strconv.ParseFloat(element.Find("div.ui-search-price__second-line span.andes-money-amount__fraction").Text(), 64)
+			rawPrice := strings.ReplaceAll(element.Find("div.ui-search-price__second-line span.andes-money-amount__fraction").Text(), ".", "")
+			price, _ := strconv.ParseFloat(rawPrice, 64)
 			link, _ := element.Find("a.ui-search-link").Attr("href")
 			image, _ := element.Find("img.ui-search-result-image__element").Attr("data-src")
 			unavailable, _ := element.Find("div.ui-search-card-add-to-cart").Attr("disabled")
 
-			return product.ExtendedSchema{
+			return products.ExtendedSchema{
 				ID:          id,
 				Name:        name,
 				Link:        link,
