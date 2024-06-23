@@ -89,6 +89,9 @@ func NormalizedScraper(c *gin.Context) {
 		}
 	}
 
+	filteredProducts := products.Fuzzy(normalizedProducts, query)
+	sortedProducts := products.Sort(filteredProducts)
+
 	// Return the products
 	c.JSON(http.StatusOK, gin.H{
 		"products":       sortedProducts,
