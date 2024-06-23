@@ -1,6 +1,6 @@
 package html
 
-import "ratoneando/product"
+import "ratoneando/products"
 
 type CoreProps struct {
 	BaseUrl           string
@@ -11,5 +11,5 @@ type CoreProps struct {
 	ContainerSelector string
 	ProductSelector   string
 	SkipIfSelector    string
-	Extractor         func(element *ElementWrapper, doc *DocumentWrapper) product.ExtendedSchema
+	Extractor         func(element *ElementWrapper, doc *DocumentWrapper) products.ExtendedSchema
 }

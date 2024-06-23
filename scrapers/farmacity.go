@@ -2,10 +2,10 @@ package scrapers
 
 import (
 	"ratoneando/cores/vtex"
-	"ratoneando/product"
+	"ratoneando/products"
 )
 
-func Farmacity(query string) ([]product.Schema, error) {
+func Farmacity(query string) ([]products.Schema, error) {
 	return vtex.Core(vtex.CoreProps{
 		Query:   query,
 		BaseUrl: "https://www.farmacity.com",

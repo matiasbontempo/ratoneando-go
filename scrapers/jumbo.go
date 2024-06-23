@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"ratoneando/cores/api"
-	"ratoneando/product"
+	"ratoneando/products"
 )
 
 type ResponseProduct struct {
@@ -40,7 +40,7 @@ type RawProduct struct {
 
 type ResponseStructure []ResponseProduct
 
-func Jumbo(query string) ([]product.Schema, error) {
+func Jumbo(query string) ([]products.Schema, error) {
 	return api.Core(api.CoreProps[ResponseStructure, RawProduct]{
 		Query:         query,
 		BaseUrl:       "https://www.jumbo.com.ar",
@@ -61,8 +61,8 @@ func Jumbo(query string) ([]product.Schema, error) {
 
 			return normalizedProducts
 		},
-		Extractor: func(rawProduct RawProduct) product.ExtendedSchema {
-			return product.ExtendedSchema{
+		Extractor: func(rawProduct RawProduct) products.ExtendedSchema {
+			return products.ExtendedSchema{
 				ID:          rawProduct.ProductId,
 				Source:      "jumbo",
 				Name:        rawProduct.ProductName,

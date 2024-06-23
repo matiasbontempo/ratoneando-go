@@ -2,10 +2,10 @@ package scrapers
 
 import (
 	"ratoneando/cores/vtex"
-	"ratoneando/product"
+	"ratoneando/products"
 )
 
-func Carrefour(query string) ([]product.Schema, error) {
+func Carrefour(query string) ([]products.Schema, error) {
 	return vtex.Core(vtex.CoreProps{
 		Query:   query,
 		BaseUrl: "https://www.carrefour.com.ar",

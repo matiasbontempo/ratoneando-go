@@ -2,13 +2,13 @@ package scrapers
 
 import (
 	"ratoneando/cores/vtex"
-	"ratoneando/product"
+	"ratoneando/products"
 )
 
-func MasOnline(query string) ([]product.Schema, error) {
+func MasOnline(query string) ([]products.Schema, error) {
 	return vtex.Core(vtex.CoreProps{
 		Query:   query,
-		BaseUrl: "https://www.masonlinae.com.ar",
+		BaseUrl: "https://www.masonline.com.ar",
 		Source:  "masonline",
 	})
 }

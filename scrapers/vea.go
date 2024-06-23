@@ -2,10 +2,10 @@ package scrapers
 
 import (
 	"ratoneando/cores/vtex"
-	"ratoneando/product"
+	"ratoneando/products"
 )
 
-func Vea(query string) ([]product.Schema, error) {
+func Vea(query string) ([]products.Schema, error) {
 	return vtex.Core(vtex.CoreProps{
 		Query:   query,
 		BaseUrl: "https://www.jumbo.com.ar",

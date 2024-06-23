@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"ratoneando/config"
-	"ratoneando/product"
+	"ratoneando/products"
 	"ratoneando/scrapers"
 )
 
@@ -46,7 +46,7 @@ func NormalizedScraper(c *gin.Context) {
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 
-	scrappers := []func(string) ([]product.Schema, error){
+	scrappers := []func(string) ([]products.Schema, error){
 		scrapers.Carrefour,
 		scrapers.Coto,
 		scrapers.DiaOnline,
@@ -59,7 +59,7 @@ func NormalizedScraper(c *gin.Context) {
 	}
 
 	type result struct {
-		Products []product.Schema
+		Products []products.Schema
 		Error    error
 	}
 
@@ -67,7 +67,7 @@ func NormalizedScraper(c *gin.Context) {
 
 	for i, scrapper := range scrappers {
 		wg.Add(1)
-		go func(i int, scrapper func(string) ([]product.Schema, error)) {
+		go func(i int, scrapper func(string) ([]products.Schema, error)) {
 			defer wg.Done()
 			products, err := scrapper(query)
 			mu.Lock()
@@ -79,7 +79,7 @@ func NormalizedScraper(c *gin.Context) {
 	wg.Wait()
 
 	var failedScrappers []string
-	var normalizedProducts []product.Schema
+	var normalizedProducts []products.Schema
 
 	for _, result := range results {
 		if result.Error != nil {
@@ -91,7 +91,7 @@ func NormalizedScraper(c *gin.Context) {
 
 	// Return the products
 	c.JSON(http.StatusOK, gin.H{
-		"products":       normalizedProducts,
+		"products":       sortedProducts,
 		"failedScrapers": failedScrappers,
 		"timestamp":      time.Now(),
 	})

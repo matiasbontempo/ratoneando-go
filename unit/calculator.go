@@ -3,14 +3,14 @@ package unit
 import (
 	"strings"
 
-	"ratoneando/product"
+	"ratoneando/products"
 )
 
-func CalculateUnitInfo(prod product.ExtendedSchema) product.Schema {
+func CalculateUnitInfo(prod products.ExtendedSchema) products.Schema {
 	unit, unitFactor := ExtractUnit(prod)
 	unitPrice := computeUnitPrice(prod.Price, unitFactor, unit, prod.UnitPrice)
 
-	return product.Schema{
+	return products.Schema{
 		ID:        prod.ID,
 		Name:      prod.Name,
 		Link:      prod.Link,

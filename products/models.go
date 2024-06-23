@@ -1,4 +1,4 @@
-package product
+package products
 
 type Schema struct {
 	ID        string  `json:"id"`

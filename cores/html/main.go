@@ -7,7 +7,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 
-	"ratoneando/product"
+	"ratoneando/products"
 	"ratoneando/unit"
 	"ratoneando/utils/logger"
 )
@@ -20,7 +20,7 @@ type DocumentWrapper struct {
 	*goquery.Document
 }
 
-func Core(props CoreProps) ([]product.Schema, error) {
+func Core(props CoreProps) ([]products.Schema, error) {
 	escapedQuery := url.PathEscape(props.Query)
 	searchUrl := props.BaseUrl + props.SearchPattern(escapedQuery)
 
@@ -39,14 +39,14 @@ func Core(props CoreProps) ([]product.Schema, error) {
 
 	if props.Raw {
 		html, _ := doc.Html()
-		return []product.Schema{{Source: props.Source, Name: html}}, nil
+		return []products.Schema{{Source: props.Source, Name: html}}, nil
 	}
 
 	if props.SkipIfSelector != "" && doc.Find(props.SkipIfSelector).Length() > 0 {
-		return []product.Schema{}, nil
+		return []products.Schema{}, nil
 	}
 
-	products := []product.Schema{}
+	products := []products.Schema{}
 	doc.Find(props.ContainerSelector).Find(props.ProductSelector).Each(func(i int, s *goquery.Selection) {
 		element := &ElementWrapper{s}
 		product := props.Extractor(element, &DocumentWrapper{doc})

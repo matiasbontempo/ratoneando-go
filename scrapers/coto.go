@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"ratoneando/cores/html"
-	"ratoneando/product"
+	"ratoneando/products"
 	"ratoneando/utils/numbers"
 )
 
@@ -22,7 +22,7 @@ func extractor(element *html.ElementWrapper, doc *html.DocumentWrapper) product.
 	image, _ := element.Find("span.atg_store_productImage > img").Attr("src")
 	unavailable := element.Find("div.product_not_available").Length() > 0
 
-	return product.ExtendedSchema{
+	return products.ExtendedSchema{
 		ID:          id,
 		Name:        name,
 		Link:        link,
@@ -32,7 +32,7 @@ func extractor(element *html.ElementWrapper, doc *html.DocumentWrapper) product.
 	}
 }
 
-func Coto(query string) ([]product.Schema, error) {
+func Coto(query string) ([]products.Schema, error) {
 	return html.Core(html.CoreProps{
 		Query:   query,
 		BaseUrl: "https://www.cotodigital3.com.ar",

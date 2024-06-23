@@ -2,11 +2,11 @@ package scrapers
 
 import (
 	"ratoneando/cores/html"
-	"ratoneando/product"
+	"ratoneando/products"
 	"strconv"
 )
 
-func MercadoLibre(query string) ([]product.Schema, error) {
+func MercadoLibre(query string) ([]products.Schema, error) {
 	return html.Core(html.CoreProps{
 		Query:             query,
 		BaseUrl:           "https://listado.mercadolibre.com.ar",
@@ -15,7 +15,7 @@ func MercadoLibre(query string) ([]product.Schema, error) {
 		ContainerSelector: "div.ui-search-main",
 		ProductSelector:   ".andes-card.ui-search-result",
 		SkipIfSelector:    ".ui-search-zrp-disclaimer",
-		Extractor: func(element *html.ElementWrapper, doc *html.DocumentWrapper) product.ExtendedSchema {
+		Extractor: func(element *html.ElementWrapper, doc *html.DocumentWrapper) products.ExtendedSchema {
 			id, _ := element.Attr("id")
 			name := element.Find("h2.ui-search-item__title").Text()
 			price, _ := strconv.ParseFloat(element.Find("div.ui-search-price__second-line span.andes-money-amount__fraction").Text(), 64)

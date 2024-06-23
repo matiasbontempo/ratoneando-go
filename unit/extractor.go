@@ -5,14 +5,14 @@ import (
 	"strconv"
 	"strings"
 
-	"ratoneando/product"
+	"ratoneando/products"
 
 	"github.com/dlclark/regexp2"
 )
 
 var unitRegex = regexp2.MustCompile(`(?<!\p{L})([0-9]+(?:[.,][0-9]{1,3})?) ?(l|lt|cc|ml|k|kg|g|c|u|un|uni|ud)`, 0)
 
-func ExtractUnit(prod product.ExtendedSchema) (string, float64) {
+func ExtractUnit(prod products.ExtendedSchema) (string, float64) {
 	if prod.Unit != "" && prod.Unit != "un" {
 		return prod.Unit, 1
 	}

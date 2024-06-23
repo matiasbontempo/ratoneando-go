@@ -1,6 +1,6 @@
 package api
 
-import "ratoneando/product"
+import "ratoneando/products"
 
 type CoreProps[ResponseStructure any, NormalizedProduct any] struct {
 	Query         string
@@ -8,6 +8,6 @@ type CoreProps[ResponseStructure any, NormalizedProduct any] struct {
 	SearchPattern func(string) string
 	Source        string
 	Normalizer    func(ResponseStructure) []NormalizedProduct
-	Extractor     func(NormalizedProduct) product.ExtendedSchema
+	Extractor     func(NormalizedProduct) products.ExtendedSchema
 	Raw           bool
 }

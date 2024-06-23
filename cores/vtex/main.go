@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"ratoneando/cores/api"
-	"ratoneando/product"
+	"ratoneando/products"
 )
 
-func Core(props CoreProps) ([]product.Schema, error) {
+func Core(props CoreProps) ([]products.Schema, error) {
 	return api.Core(api.CoreProps[ResponseStructure, RawProduct]{
 		Query:         props.Query,
 		BaseUrl:       props.BaseUrl + "/_v/segment/graphql/v1/",
@@ -31,8 +31,8 @@ func Core(props CoreProps) ([]product.Schema, error) {
 
 			return expandedProducts
 		},
-		Extractor: func(normalizedProduct RawProduct) product.ExtendedSchema {
-			return product.ExtendedSchema{
+		Extractor: func(normalizedProduct RawProduct) products.ExtendedSchema {
+			return products.ExtendedSchema{
 				ID:        normalizedProduct.ProductId,
 				Name:      normalizedProduct.ProductName,
 				Link:      fmt.Sprintf("%s/%s/p", props.BaseUrl, normalizedProduct.LinkText),
