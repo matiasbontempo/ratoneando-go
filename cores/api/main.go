@@ -40,7 +40,11 @@ func Core[ResponseStructure any, RawProduct any](props CoreProps[ResponseStructu
 
 	products := make([]products.Schema, len(normalizedProducts))
 	for i, product := range normalizedProducts {
-		products[i] = unit.CalculateUnitInfo(props.Extractor(product))
+		extractedProduct := props.Extractor(product)
+		if extractedProduct.Unavailable {
+			continue
+		}
+		products[i] = unit.CalculateUnitInfo(extractedProduct)
 	}
 
 	return products, nil
