@@ -32,7 +32,7 @@ func extractor(element *html.ElementWrapper, doc *html.DocumentWrapper) product.
 	}
 }
 
-func CotoScraper(query string) ([]product.Schema, error) {
+func Coto(query string) ([]product.Schema, error) {
 	return html.Core(html.CoreProps{
 		Query:   query,
 		BaseUrl: "https://www.cotodigital3.com.ar",

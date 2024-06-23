@@ -47,8 +47,15 @@ func NormalizedScraper(c *gin.Context) {
 	var mu sync.Mutex
 
 	scrappers := []func(string) ([]product.Schema, error){
-		scrapers.CotoScraper,
-		scrapers.JumboScraper,
+		scrapers.Carrefour,
+		scrapers.Coto,
+		scrapers.DiaOnline,
+		scrapers.Disco,
+		scrapers.Farmacity,
+		scrapers.Jumbo,
+		scrapers.MasOnline,
+		scrapers.MercadoLibre,
+		scrapers.Vea,
 	}
 
 	type result struct {

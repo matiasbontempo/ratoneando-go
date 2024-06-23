@@ -40,7 +40,7 @@ type RawProduct struct {
 
 type ResponseStructure []ResponseProduct
 
-func JumboScraper(query string) ([]product.Schema, error) {
+func Jumbo(query string) ([]product.Schema, error) {
 	return api.Core(api.CoreProps[ResponseStructure, RawProduct]{
 		Query:         query,
 		BaseUrl:       "https://www.jumbo.com.ar",
