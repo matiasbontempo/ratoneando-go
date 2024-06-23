@@ -25,7 +25,7 @@ func extractor(element *html.ElementWrapper, doc *html.DocumentWrapper) products
 
 	// rawPrice := coalesce(element.Find(".price_discount").Text(), element.Find(".info_discount span.atg_store_newPrice").Text())
 	rawPrice := coalesce(
-		element.Find(".price_regular_precio").Text(),
+		strings.ReplaceAll(element.Find(".price_discount_gde").Text(), ".", ","),
 		element.Find("span.atg_store_newPrice").First().Text(),
 	)
 
