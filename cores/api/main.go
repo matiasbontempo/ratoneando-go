@@ -7,10 +7,11 @@ import (
 	"net/url"
 
 	"ratoneando/product"
+	"ratoneando/unit"
 	"ratoneando/utils/logger"
 )
 
-func Core[ResponseStructure any](props CoreProps[ResponseStructure]) ([]product.Schema, error) {
+func Core[ResponseStructure any, RawProduct any](props CoreProps[ResponseStructure, RawProduct]) ([]product.Schema, error) {
 	escapedQuery := url.PathEscape(props.Query)
 	searchUrl := props.BaseUrl + props.SearchPattern(escapedQuery)
 
@@ -34,7 +35,12 @@ func Core[ResponseStructure any](props CoreProps[ResponseStructure]) ([]product.
 		return nil, err
 	}
 
-	normalizedProducts := props.Extractor(responseStructure)
+	normalizedProducts := props.Normalizer(responseStructure)
 
-	return normalizedProducts, nil
+	products := make([]product.Schema, len(normalizedProducts))
+	for i, product := range normalizedProducts {
+		products[i] = unit.CalculateUnitInfo(props.Extractor(product))
+	}
+
+	return products, nil
 }

@@ -5,7 +5,6 @@ import (
 
 	"ratoneando/cores/api"
 	"ratoneando/product"
-	"ratoneando/unit"
 )
 
 type ResponseProduct struct {
@@ -29,42 +28,52 @@ type ResponseProduct struct {
 	} `json:"items"`
 }
 
+type ProductData struct {
+	MeasurementUnitUn string  `json:"MeasurementUnit"`
+	UnitMultiplierUn  float64 `json:"UnitMultiplier"`
+}
+
+type RawProduct struct {
+	ResponseProduct
+	ProductData
+}
+
 type ResponseStructure []ResponseProduct
 
 func JumboScraper(query string) ([]product.Schema, error) {
-	return api.Core(api.CoreProps[ResponseStructure]{
+	return api.Core(api.CoreProps[ResponseStructure, RawProduct]{
 		Query:         query,
 		BaseUrl:       "https://www.jumbo.com.ar",
 		SearchPattern: func(q string) string { return "/api/catalog_system/pub/products/search/?ft=" + q },
 		Source:        "jumbo",
-		Extractor: func(response ResponseStructure) []product.Schema {
-			var normalizedProducts []product.Schema
+		Normalizer: func(response ResponseStructure) []RawProduct {
+			var normalizedProducts []RawProduct
 
 			for _, rawProduct := range response {
-				var productData struct {
-					MeasurementUnitUn string  `json:"MeasurementUnit"`
-					UnitMultiplierUn  float64 `json:"UnitMultiplier"`
-				}
-
+				var productData ProductData
 				json.Unmarshal([]byte(rawProduct.ProductData[0]), &productData)
 
-				var extendedProduct product.ExtendedSchema = product.ExtendedSchema{
-					ID:          rawProduct.ProductId,
-					Source:      "jumbo",
-					Name:        rawProduct.ProductName,
-					Link:        rawProduct.Link,
-					Image:       rawProduct.Items[0].Images[0].ImageUrl,
-					Unavailable: !rawProduct.Items[0].Sellers[0].CommertialOffer.IsAvailable,
-					Price:       rawProduct.Items[0].Sellers[0].CommertialOffer.Price,
-					ListPrice:   rawProduct.Items[0].Sellers[0].CommertialOffer.ListPrice,
-					Unit:        productData.MeasurementUnitUn,
-					UnitFactor:  productData.UnitMultiplierUn,
-				}
-
-				normalizedProducts = append(normalizedProducts, unit.CalculateUnitInfo(extendedProduct))
+				normalizedProducts = append(normalizedProducts, RawProduct{
+					ResponseProduct: rawProduct,
+					ProductData:     productData,
+				})
 			}
 
 			return normalizedProducts
+		},
+		Extractor: func(rawProduct RawProduct) product.ExtendedSchema {
+			return product.ExtendedSchema{
+				ID:          rawProduct.ProductId,
+				Source:      "jumbo",
+				Name:        rawProduct.ProductName,
+				Link:        rawProduct.Link,
+				Image:       rawProduct.Items[0].Images[0].ImageUrl,
+				Unavailable: !rawProduct.Items[0].Sellers[0].CommertialOffer.IsAvailable,
+				Price:       rawProduct.Items[0].Sellers[0].CommertialOffer.Price,
+				ListPrice:   rawProduct.Items[0].Sellers[0].CommertialOffer.ListPrice,
+				Unit:        rawProduct.MeasurementUnitUn,
+				UnitFactor:  rawProduct.UnitMultiplierUn,
+			}
 		},
 	})
 }
