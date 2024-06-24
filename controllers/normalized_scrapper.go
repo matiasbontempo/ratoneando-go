@@ -120,8 +120,7 @@ func NormalizedScraper(c *gin.Context) {
 		"timestamp":      time.Now(),
 	}
 	// Cache the response
-	stringifiedResponse := []byte{}
-	stringifiedResponse, _ = json.Marshal(response)
+	stringifiedResponse, _ := json.Marshal(response)
 
 	cache.Set(query, string(stringifiedResponse), time.Duration(config.CORE_CACHE_EXPIRATION)*time.Second)
 

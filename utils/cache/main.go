@@ -39,7 +39,6 @@ func Get(key string) (string, error) {
 	ctx := context.Background()
 	value, err := Client.Get(ctx, key).Result()
 	if err != nil {
-		logger.LogWarn("Error getting key: " + key)
 		return "", err
 	}
 	return value, nil

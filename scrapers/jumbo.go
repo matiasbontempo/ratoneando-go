@@ -2,9 +2,11 @@ package scrapers
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"ratoneando/cores/api"
 	"ratoneando/products"
+	"ratoneando/utils/logger"
 )
 
 type ResponseProduct struct {
@@ -51,7 +53,17 @@ func Jumbo(query string) ([]products.Schema, error) {
 
 			for _, rawProduct := range response {
 				var productData ProductData
-				json.Unmarshal([]byte(rawProduct.ProductData[0]), &productData)
+
+				if len(rawProduct.ProductData) == 0 {
+					continue
+				}
+
+				err := json.Unmarshal([]byte(rawProduct.ProductData[0]), &productData)
+
+				if err != nil {
+					logger.LogWarn(fmt.Sprintf("Error unmarshalling product data: %s", err))
+					continue
+				}
 
 				normalizedProducts = append(normalizedProducts, RawProduct{
 					ResponseProduct: rawProduct,
