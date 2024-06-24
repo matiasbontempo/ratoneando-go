@@ -27,7 +27,7 @@ func NormalizedScraper(c *gin.Context) {
 	}
 
 	// Check if the request is coming from a valid source
-	if config.ENV == "production" && (referer == "" || !strings.Contains(referer, config.WEB_URL)) {
+	if config.ENV == "release" && (referer == "" || !strings.Contains(referer, config.WEB_URL)) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden."})
 		return
 	}
