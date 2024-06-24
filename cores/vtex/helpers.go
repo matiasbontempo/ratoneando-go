@@ -7,17 +7,14 @@ import (
 	"strings"
 )
 
-// EncodeBase64 encodes a string to base64.
 func EncodeBase64(str string) string {
 	return base64.StdEncoding.EncodeToString([]byte(str))
 }
 
-// EncodeUrl encodes a string to URL encoding.
 func EncodeUrl(str string) string {
 	return url.QueryEscape(str)
 }
 
-// EncodeQueryParams encodes query parameters to URL query string.
 func EncodeQueryParams(params map[string]string) string {
 	var queryParams []string
 	for key, value := range params {
@@ -26,7 +23,6 @@ func EncodeQueryParams(params map[string]string) string {
 	return "?" + strings.Join(queryParams, "&")
 }
 
-// GetVariablesWithQuery returns the variables with the query.
 func GetVariablesWithQuery(q string) map[string]interface{} {
 	return map[string]interface{}{
 		"productOriginVtex":    true,
@@ -39,7 +35,6 @@ func GetVariablesWithQuery(q string) map[string]interface{} {
 	}
 }
 
-// GetExtensionsWithQuery returns the extensions with the query.
 func GetExtensionsWithQuery(q string) map[string]interface{} {
 	variables, _ := json.Marshal(GetVariablesWithQuery(q))
 	return map[string]interface{}{
@@ -53,7 +48,6 @@ func GetExtensionsWithQuery(q string) map[string]interface{} {
 	}
 }
 
-// EncodeQuery encodes the query into URL parameters.
 func EncodeQuery(query string) string {
 	extensions, _ := json.Marshal(GetExtensionsWithQuery(query))
 	queryParams := map[string]string{

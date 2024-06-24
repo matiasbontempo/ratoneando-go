@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -12,6 +13,7 @@ import (
 	"ratoneando/config"
 	"ratoneando/products"
 	"ratoneando/scrapers"
+	"ratoneando/utils/cache"
 )
 
 func NormalizedScraper(c *gin.Context) {
@@ -36,6 +38,20 @@ func NormalizedScraper(c *gin.Context) {
 		c.JSON(http.StatusForbidden, gin.H{
 			"error": "Forbidden",
 		})
+		return
+	}
+
+	// Cache
+	cacheResponse, _ := cache.Get(query)
+	if cacheResponse != "" {
+		response := gin.H{}
+		json.Unmarshal([]byte(cacheResponse), &response)
+
+		c.Header("Cache-Control", "public, max-age="+config.RESPONSE_CACHE_EXPIRATION)
+		c.Header("X-Cache", "HIT")
+
+		c.JSON(http.StatusOK, response)
+
 		return
 	}
 
@@ -92,10 +108,17 @@ func NormalizedScraper(c *gin.Context) {
 	filteredProducts := products.Fuzzy(normalizedProducts, query)
 	sortedProducts := products.Sort(filteredProducts)
 
-	// Return the products
-	c.JSON(http.StatusOK, gin.H{
+	response := gin.H{
 		"products":       sortedProducts,
 		"failedScrapers": failedScrappers,
 		"timestamp":      time.Now(),
-	})
+	}
+	// Cache the response
+	stringifiedResponse := []byte{}
+	stringifiedResponse, _ = json.Marshal(response)
+
+	cache.Set(query, string(stringifiedResponse), time.Duration(config.CORE_CACHE_EXPIRATION)*time.Second)
+
+	// Return the products
+	c.JSON(http.StatusOK, response)
 }

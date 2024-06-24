@@ -18,7 +18,15 @@ var (
 	CORE_CACHE_EXPIRATION     int
 )
 
-func InitConfig() {
+func getEnv(key, defaultValue string) string {
+	value, exists := os.LookupEnv(key)
+	if !exists {
+		return defaultValue
+	}
+	return value
+}
+
+func Init() {
 	err := godotenv.Load()
 	if err != nil {
 		logger.LogFatal("Error loading .env file")
@@ -31,12 +39,4 @@ func InitConfig() {
 	REDIS_CACHE_EXPIRATION = getEnv("REDIS_CACHE_EXPIRATION", "28800")
 	RESPONSE_CACHE_EXPIRATION = getEnv("RESPONSE_CACHE_EXPIRATION", "3600")
 	CORE_CACHE_EXPIRATION, _ = strconv.Atoi(getEnv("CORE_CACHE_EXPIRATION", "0"))
-}
-
-func getEnv(key, defaultValue string) string {
-	value, exists := os.LookupEnv(key)
-	if !exists {
-		return defaultValue
-	}
-	return value
 }

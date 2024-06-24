@@ -6,11 +6,17 @@ import (
 	"ratoneando/config"
 	"ratoneando/middlewares"
 	"ratoneando/routes"
+	"ratoneando/utils/cache"
 	"ratoneando/utils/logger"
 )
 
 func main() {
-	config.InitConfig()
+	logger.Init()
+	config.Init()
+	cache.Init()
+
+	gin.SetMode(config.ENV)
+
 	port := config.PORT
 
 	router := gin.Default()

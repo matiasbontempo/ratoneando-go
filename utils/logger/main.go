@@ -2,21 +2,17 @@ package logger
 
 import (
 	"os"
-	"sync"
 
 	"github.com/rs/zerolog"
 )
 
 var (
 	Logger zerolog.Logger
-	once   sync.Once
 )
 
-func init() {
-	once.Do(func() {
-		output := zerolog.ConsoleWriter{Out: os.Stdout}
-		Logger = zerolog.New(output).With().Timestamp().Logger()
-	})
+func Init() {
+	output := zerolog.ConsoleWriter{Out: os.Stdout}
+	Logger = zerolog.New(output).With().Timestamp().Logger()
 }
 
 func Log(message string) {

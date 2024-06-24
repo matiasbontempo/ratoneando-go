@@ -4,3 +4,5 @@
 .env.production
 
 .air.toml
+
+*.exe
