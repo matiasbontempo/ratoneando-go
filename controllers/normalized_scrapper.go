@@ -32,6 +32,12 @@ func NormalizedScraper(c *gin.Context) {
 		return
 	}
 
+	// Check if the query is empty
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Query is empty."})
+		return
+	}
+
 	// Quick check to see if the query is valid
 	if strings.ToLower(query) != query {
 		fmt.Println("Uppercase query", query, c.Request.Header, clientIp)
