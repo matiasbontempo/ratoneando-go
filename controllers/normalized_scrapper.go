@@ -122,7 +122,7 @@ func NormalizedScraper(c *gin.Context) {
 	// Cache the response
 	stringifiedResponse, _ := json.Marshal(response)
 
-	cache.Set(query, string(stringifiedResponse), time.Duration(config.CORE_CACHE_EXPIRATION)*time.Second)
+	cache.Set(query, string(stringifiedResponse), config.REDIS_CACHE_EXPIRATION)
 
 	// Return the products
 	c.JSON(http.StatusOK, response)

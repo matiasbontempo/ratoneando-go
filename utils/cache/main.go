@@ -25,9 +25,9 @@ func Init() {
 	Client = client
 }
 
-func Set(key string, value string, expiration time.Duration) error {
+func Set(key string, value string, expiration int) error {
 	ctx := context.Background()
-	err := Client.Set(ctx, key, value, expiration).Err()
+	err := Client.Set(ctx, key, value, time.Duration(expiration)*time.Second).Err()
 	if err != nil {
 		logger.LogWarn("Error setting key: " + key)
 		return err
