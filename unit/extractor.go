@@ -18,25 +18,25 @@ func ExtractUnit(prod products.ExtendedSchema) (string, float64) {
 	}
 
 	title := strings.ToLower(prod.Name)
-	matches, _ := unitRegex.FindStringMatch(title)
+	matches, err := unitRegex.FindStringMatch(title)
 
-	if matches == nil {
+	if err != nil || matches == nil {
 		if strings.Contains(title, "x kg") {
 			return kilo, 1
 		}
 		return prod.Unit, 1
 	}
 
-	content := matches.Groups()[1].String()
+	value := matches.Groups()[1].String()
 	unit := matches.Groups()[2].String()
 
-	parsedContent, err := strconv.ParseFloat(strings.ReplaceAll(content, ",", "."), 64)
+	parsedValue, err := strconv.ParseFloat(strings.ReplaceAll(value, ",", "."), 64)
 	if err != nil {
 		fmt.Println("Error parsing content:", err)
 		return prod.Unit, 1
 	}
 
-	unitFactor := computeUnitFactor(parsedContent, unit)
+	unitFactor := computeUnitFactor(parsedValue, unit)
 	return unitMapper[strings.ToUpper(unit)], unitFactor
 }
 

@@ -1,8 +1,6 @@
 package unit
 
 import (
-	"strings"
-
 	"ratoneando/products"
 )
 
@@ -17,7 +15,7 @@ func CalculateUnitInfo(prod products.ExtendedSchema) products.Schema {
 		Image:     prod.Image,
 		Source:    prod.Source,
 		Price:     prod.Price,
-		Unit:      normalizeUnit(unit),
+		Unit:      unit,
 		UnitPrice: unitPrice,
 	}
 }
@@ -27,8 +25,7 @@ func computeUnitPrice(price, unitFactor float64, unit string, unitPrice float64)
 		unitPrice = price / unitFactor
 	}
 
-	rawUnit := normalizeRawUnit(unit)
-	if rawUnit == "CC" || rawUnit == "ML" || rawUnit == "G" || rawUnit == "GR" {
+	if unit == "CC" || unit == "ML" || unit == "G" || unit == "GR" {
 		unitPrice *= 1000
 	}
 
@@ -37,16 +34,4 @@ func computeUnitPrice(price, unitFactor float64, unit string, unitPrice float64)
 	}
 
 	return unitPrice
-}
-
-func normalizeUnit(unit string) string {
-	rawUnit := normalizeRawUnit(unit)
-	if normalizedUnit, exists := unitMapper[rawUnit]; exists {
-		return normalizedUnit
-	}
-	return units
-}
-
-func normalizeRawUnit(unit string) string {
-	return strings.ToUpper(strings.ReplaceAll(unit, "[^A-Z]", ""))
 }
