@@ -27,11 +27,17 @@ func GetVariablesWithQuery(q string) map[string]interface{} {
 	return map[string]interface{}{
 		"productOriginVtex":    true,
 		"simulationBehavior":   "default",
-		"hideUnavailableItems": true,
-		"fullText":             q,
-		"count":                6,
-		"shippingOptions":      []string{},
-		"variant":              nil,
+		"hideUnavailableItems": false,
+		"advertisementOptions": map[string]interface{}{
+			"showSponsored":           true,
+			"sponsoredCount":          2,
+			"repeatSponsoredProducts": false,
+			"advertisementPlacement":  "autocomplete",
+		},
+		"fullText":        q,
+		"count":           4,
+		"shippingOptions": []string{},
+		"variant":         nil,
 	}
 }
 
@@ -53,6 +59,7 @@ func EncodeQuery(query string) string {
 	queryParams := map[string]string{
 		"workspace":     "master",
 		"maxAge":        "medium",
+		"appsEtag":      "remove",
 		"domain":        "store",
 		"locale":        "es-AR",
 		"operationName": "productSuggestions",
