@@ -27,17 +27,11 @@ func GetVariablesWithQuery(q string) map[string]interface{} {
 	return map[string]interface{}{
 		"productOriginVtex":    true,
 		"simulationBehavior":   "default",
-		"hideUnavailableItems": false,
-		"advertisementOptions": map[string]interface{}{
-			"showSponsored":           true,
-			"sponsoredCount":          2,
-			"repeatSponsoredProducts": false,
-			"advertisementPlacement":  "autocomplete",
-		},
-		"fullText":        q,
-		"count":           4,
-		"shippingOptions": []string{},
-		"variant":         nil,
+		"hideUnavailableItems": true,
+		"fullText":             q,
+		"count":                4,
+		"shippingOptions":      []string{},
+		"variant":              nil,
 	}
 }
 
