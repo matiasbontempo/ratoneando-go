@@ -29,7 +29,7 @@ func GetVariablesWithQuery(q string) map[string]interface{} {
 		"simulationBehavior":   "default",
 		"hideUnavailableItems": true,
 		"fullText":             q,
-		"count":                6,
+		"count":                4,
 		"shippingOptions":      []string{},
 		"variant":              nil,
 	}
@@ -40,7 +40,7 @@ func GetExtensionsWithQuery(q string) map[string]interface{} {
 	return map[string]interface{}{
 		"persistedQuery": map[string]interface{}{
 			"version":    1,
-			"sha256Hash": "38162aedddb0d0a8642b0fdb5beac3ff921e16d77701245aa71d464633a969b7",
+			"sha256Hash": "3ee3b7e0a0925e8f31c69dd635750bebb5e9602d2c7b9c501415dc76e2a313f5",
 			"sender":     "vtex.store-resources@0.x",
 			"provider":   "vtex.search-graphql@0.x",
 		},
@@ -53,6 +53,7 @@ func EncodeQuery(query string) string {
 	queryParams := map[string]string{
 		"workspace":     "master",
 		"maxAge":        "medium",
+		"appsEtag":      "remove",
 		"domain":        "store",
 		"locale":        "es-AR",
 		"operationName": "productSuggestions",

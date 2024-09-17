@@ -6,3 +6,5 @@
 .air.toml
 
 *.exe
+
+.vscode
