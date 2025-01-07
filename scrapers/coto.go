@@ -83,12 +83,14 @@ func Coto(query string) ([]products.Schema, error) {
 		Extractor: func(rawProduct CotoRawProduct) products.ExtendedSchema {
       listPrice, _ := strconv.ParseFloat(rawProduct.Records[0].Attributes.SkuActivePrice[0], 64)
       var price float64 = listPrice
+
       if len(rawProduct.CotoProductDiscounts) > 0 {
-          price, _ = strconv.ParseFloat(rawProduct.CotoProductDiscounts[0].precioDescuento, 64)
+          precioDescuento, _ := strconv.ParseFloat(rawProduct.CotoProductDiscounts[0].precioDescuento, 64)
+          if (precioDescuento > 0) {
+              price = precioDescuento
+          }
       }
 
-      fmt.Println(price)
-      fmt.Println(listPrice)
 			return products.ExtendedSchema{
 				ID:          rawProduct.CotoResponseProduct.Attributes.ProductRepositoryId[0],
 				Source:      "coto",
