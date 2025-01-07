@@ -40,7 +40,7 @@ func GetExtensionsWithQuery(q string) map[string]interface{} {
 	return map[string]interface{}{
 		"persistedQuery": map[string]interface{}{
 			"version":    1,
-			"sha256Hash": "db333c9cfdf258f98d62add1567adf4e594a8195da9c70f68a1ef614d5a67242",
+			"sha256Hash": "0ef2c56d9518b51f912c2305ac4b07851c265b645dcbece6843c568bb91d39ff",
 			"sender":     "vtex.store-resources@0.x",
 			"provider":   "vtex.search-graphql@0.x",
 		},

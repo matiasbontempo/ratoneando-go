@@ -36,6 +36,20 @@ func Core[ResponseStructure any, RawProduct any](props CoreProps[ResponseStructu
 		return nil, fmt.Errorf(props.Source)
 	}
 
+	var errorCheck struct {
+		Errors []struct {
+			Message    string `json:"message"`
+			Extensions struct {
+				Code string `json:"code"`
+			} `json:"extensions"`
+			Name string `json:"name"`
+		} `json:"errors"`
+	}
+	if err := json.Unmarshal(body, &errorCheck); err == nil && len(errorCheck.Errors) > 0 {
+		logger.LogError("API returned error: " + errorCheck.Errors[0].Message + " for " + escapedQuery + "@" + props.Source)
+		return nil, fmt.Errorf(props.Source)
+	}
+
 	normalizedProducts := props.Normalizer(responseStructure)
 
 	products := make([]products.Schema, len(normalizedProducts))
