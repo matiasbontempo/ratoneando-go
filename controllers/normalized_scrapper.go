@@ -70,7 +70,7 @@ func NormalizedScraper(c *gin.Context) {
 
 	scrappers := []func(string) ([]products.Schema, error){
 		scrapers.Carrefour,
-		scrapers.Coto,
+		// scrapers.Coto,
 		scrapers.DiaOnline,
 		scrapers.Disco,
 		scrapers.Farmacity,
