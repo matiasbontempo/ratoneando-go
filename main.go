@@ -15,7 +15,11 @@ func main() {
 	config.Init()
 	cache.Init()
 
-	gin.SetMode(config.ENV)
+	mode := gin.ReleaseMode
+	if config.ENV == "development" {
+		mode = gin.DebugMode
+	}
+	gin.SetMode(mode)
 
 	port := config.PORT
 
