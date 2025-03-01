@@ -32,6 +32,14 @@ func Core(props CoreProps) ([]products.Schema, error) {
 			return expandedProducts
 		},
 		Extractor: func(normalizedProduct RawProduct) products.ExtendedSchema {
+			// Add bounds checking before accessing array
+			if len(normalizedProduct.Items) == 0 {
+				return products.ExtendedSchema{}
+			}
+			if len(normalizedProduct.Items[0].Images) == 0 {
+				return products.ExtendedSchema{}
+			}
+
 			return products.ExtendedSchema{
 				ID:        normalizedProduct.ProductId,
 				Name:      normalizedProduct.ProductName,

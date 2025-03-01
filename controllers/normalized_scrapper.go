@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -91,7 +92,17 @@ func NormalizedScraper(c *gin.Context) {
 		wg.Add(1)
 		go func(i int, scrapper func(string) ([]products.Schema, error)) {
 			defer wg.Done()
+			defer func() {
+				if r := recover(); r != nil {
+					log.Printf("Recovered from panic in scraper: %v", r)
+				}
+			}()
+
 			products, err := scrapper(query)
+			if err != nil {
+				log.Printf("Error executing scraper: %v", err)
+			}
+
 			mu.Lock()
 			results[i] = result{Products: products, Error: err}
 			mu.Unlock()
