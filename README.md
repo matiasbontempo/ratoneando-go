@@ -72,6 +72,34 @@ air
 go test ./...
 ```
 
+## Herramientas
+
+Los request a VTEX necesitan un hash SHA256 que suele expirar cada algunos meses. Esta herramienta facilita la extracción y verificación de este hash.
+
+### Decodificador
+
+Recibe una URL y devuelve el hash decodificado.
+
+```bash
+go run ./cmd/decode_vtex
+```
+
+### Verificador
+
+Lee el hash de las variables de entorno, genera una url con el hash y valida si es posible hacer el request.
+
+```bash
+go run./cmd/verify_vtex
+```
+
+### Estructura de comandos
+
+```
+cmd/
+  ├── decode_vtex/    # Comando para decodificar URLs VTEX
+  └── validate_vtex/  # Comando para validar URLs y hashes VTEX
+```
+
 ## Contribuir
 
 Si te interesa dar una mano, consultá la [Guía de Contribución](CONTRIBUTING.md) y el [Código de Conducta](CODE_OF_CONDUCT.md).
