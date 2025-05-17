@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"net/url"
+	"ratoneando/config"
 	"strings"
 )
 
@@ -37,10 +38,11 @@ func GetVariablesWithQuery(q string) map[string]interface{} {
 
 func GetExtensionsWithQuery(q string) map[string]interface{} {
 	variables, _ := json.Marshal(GetVariablesWithQuery(q))
+
 	return map[string]interface{}{
 		"persistedQuery": map[string]interface{}{
 			"version":    1,
-			"sha256Hash": "0ef2c56d9518b51f912c2305ac4b07851c265b645dcbece6843c568bb91d39ff",
+			"sha256Hash": config.VTEX_SHA256_HASH,
 			"sender":     "vtex.store-resources@0.x",
 			"provider":   "vtex.search-graphql@0.x",
 		},
