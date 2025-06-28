@@ -20,6 +20,7 @@ func main() {
 	fmt.Println("Testing VTEX hash with URL:")
 	fmt.Println(url)
 	fmt.Println("\nUsing hash:", config.VTEX_SHA256_HASH)
+	fmt.Println("Hash length:", len(config.VTEX_SHA256_HASH))
 
 	resp, err := http.Get(url)
 	if err != nil {
