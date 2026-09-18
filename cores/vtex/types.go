@@ -7,77 +7,54 @@ type CoreProps struct {
 	Raw     bool
 }
 
-type PropertyName string
-
-const (
-	PricePerUnit               PropertyName = "pricePerUnit"
-	GramajeDeUnidadDeConsumo   PropertyName = "Gramaje de unidad de consumo"
-	GramajeLeyendaDeConversión PropertyName = "Gramaje leyenda de conversión"
-	GramajeDeUnidadDeMedida    PropertyName = "Gramaje de unidad de medida"
-)
-
-type Specification struct {
-	Name         string
-	OriginalName string
-	Values       []string
+// ProductData holds the unit information VTEX ships as a stringified JSON
+// inside the ProductData attribute of the catalog API.
+type ProductData struct {
+	MeasurementUnit string  `json:"MeasurementUnit"`
+	UnitMultiplier  float64 `json:"UnitMultiplier"`
 }
 
-type SpecificationGroup struct {
-	Name           string
-	OriginalName   string
-	Specifications []Specification
+type CommertialOffer struct {
+	Price                float64 `json:"Price"`
+	ListPrice            float64 `json:"ListPrice"`
+	PriceWithoutDiscount float64 `json:"PriceWithoutDiscount"`
+	AvailableQuantity    int     `json:"AvailableQuantity"`
+	IsAvailable          bool    `json:"IsAvailable"`
 }
 
-type Property struct {
-	Name   PropertyName
-	Values []string
+type Seller struct {
+	SellerDefault   bool            `json:"sellerDefault"`
+	CommertialOffer CommertialOffer `json:"commertialOffer"`
+}
+
+type Image struct {
+	ImageUrl string `json:"imageUrl"`
+}
+
+type Item struct {
+	Name            string   `json:"name"`
+	Ean             string   `json:"ean"`
+	MeasurementUnit string   `json:"measurementUnit"`
+	UnitMultiplier  float64  `json:"unitMultiplier"`
+	Images          []Image  `json:"images"`
+	Sellers         []Seller `json:"sellers"`
 }
 
 type ResponseProduct struct {
-	CacheId          string
-	ProductId        string
-	Description      string
-	ProductName      string
-	ProductReference string
-	Brand            string
-	LinkText         string
-	Categories       []string
-	CategoryId       string
-	PriceRange       *struct {
-		SellingPrice struct {
-			HighPrice float64
-			LowPrice  float64
-		}
-		ListPrice struct {
-			HighPrice float64
-			LowPrice  float64
-		}
-	}
-	SpecificationGroups []SpecificationGroup
-	Properties          []Property
-	Items               []struct {
-		Name             string
-		Ean              string
-		MeassurementUnit string
-		UnitMultiplier   float64
-		Images           []struct {
-			ImageUrl string
-		}
-	}
+	ProductId   string   `json:"productId"`
+	ProductName string   `json:"productName"`
+	Brand       string   `json:"brand"`
+	Link        string   `json:"link"`
+	LinkText    string   `json:"linkText"`
+	ProductData []string `json:"ProductData"`
+	Items       []Item   `json:"items"`
 }
 
-type ResponseStructure struct {
-	Data struct {
-		ProductSuggestions struct {
-			Count      int
-			Misspelled *string
-			Operators  string
-			Products   []ResponseProduct
-		}
-	}
-}
+// ResponseStructure is the payload returned by the public catalog API,
+// a plain array of products.
+type ResponseStructure []ResponseProduct
 
 type RawProduct struct {
 	ResponseProduct
-	Properties map[PropertyName]string
+	ProductData
 }

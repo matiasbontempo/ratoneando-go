@@ -72,33 +72,19 @@ air
 go test ./...
 ```
 
-## Herramientas
+## Scraping de tiendas VTEX
 
-Los request a VTEX necesitan un hash SHA256 que suele expirar cada algunos meses. Esta herramienta facilita la extracción y verificación de este hash.
-
-### Decodificador
-
-Recibe una URL y devuelve el hash decodificado.
-
-```bash
-go run ./cmd/decode_vtex
-```
-
-### Verificador
-
-Lee el hash de las variables de entorno, genera una url con el hash y valida si es posible hacer el request.
-
-```bash
-go run./cmd/verify_vtex
-```
-
-### Estructura de comandos
+Carrefour, Dia, Disco, Farmacity, Jumbo, Mas Online y Vea son tiendas VTEX y se
+consultan con la API pública del catálogo:
 
 ```
-cmd/
-  ├── decode_vtex/    # Comando para decodificar URLs VTEX
-  └── validate_vtex/  # Comando para validar URLs y hashes VTEX
+https://<tienda>/api/catalog_system/pub/products/search/?ft=<query>
 ```
+
+Esta API no necesita hash, token ni sesión, así que no hay nada que actualizar
+cuando la tienda actualiza sus apps. La versión anterior usaba la GraphQL de
+`productSuggestions`, que requería un `sha256Hash` que expiraba cada algunos
+meses y dejaba a todas las tiendas VTEX sin resultados.
 
 ## Contribuir
 

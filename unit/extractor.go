@@ -13,8 +13,19 @@ import (
 var unitRegex = regexp2.MustCompile(`(?<!\p{L})([0-9]+(?:[.,][0-9]{1,3})?) ?(l|lt|cc|ml|k|kg|g|c|u|un|uni|ud)`, 0)
 
 func ExtractUnit(prod products.ExtendedSchema) (string, float64) {
-	if prod.Unit != "" && prod.Unit != "un" {
-		return prod.Unit, 1
+	// When the store reports the unit, normalize it and keep the multiplier
+	// it comes with (eg. "kg" with a 0.475 multiplier for a 475 gr product).
+	if prod.Unit != "" && strings.ToLower(prod.Unit) != "un" {
+		unitFactor := prod.UnitFactor
+		if unitFactor == 0 {
+			unitFactor = 1
+		}
+
+		if mappedUnit, ok := unitMapper[strings.ToUpper(prod.Unit)]; ok {
+			return mappedUnit, unitFactor
+		}
+
+		return prod.Unit, unitFactor
 	}
 
 	title := strings.ToLower(prod.Name)
