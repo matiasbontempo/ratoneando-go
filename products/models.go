@@ -9,6 +9,10 @@ type Schema struct {
 	Price     float64 `json:"price,omitempty"`
 	Unit      string  `json:"unit,omitempty"`
 	UnitPrice float64 `json:"unitPrice,omitempty"`
+
+	// Internal fields, used to record price history. They are not part of the public response.
+	ListPrice  float64 `json:"-"`
+	UnitFactor float64 `json:"-"`
 }
 
 type ExtendedSchema struct {

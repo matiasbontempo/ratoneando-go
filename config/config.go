@@ -17,6 +17,8 @@ var (
 	RESPONSE_CACHE_EXPIRATION = "3600"
 	CORE_CACHE_EXPIRATION     = 0
 	VTEX_SHA256_HASH          = "REPLACE_ME"
+	HISTORY_ENABLED           = false
+	HISTORY_DB_PATH           = "./data/history.db"
 )
 
 func getEnv(key, defaultValue string) string {
@@ -41,4 +43,6 @@ func Init() {
 	RESPONSE_CACHE_EXPIRATION = getEnv("RESPONSE_CACHE_EXPIRATION", "3600")
 	CORE_CACHE_EXPIRATION, _ = strconv.Atoi(getEnv("CORE_CACHE_EXPIRATION", "0"))
 	VTEX_SHA256_HASH = getEnv("VTEX_SHA256_HASH", "REPLACE_ME")
+	HISTORY_ENABLED = getEnv("HISTORY_ENABLED", "false") == "true"
+	HISTORY_DB_PATH = getEnv("HISTORY_DB_PATH", "./data/history.db")
 }

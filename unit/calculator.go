@@ -17,6 +17,9 @@ func CalculateUnitInfo(prod products.ExtendedSchema) products.Schema {
 		Price:     prod.Price,
 		Unit:      unit,
 		UnitPrice: unitPrice,
+
+		ListPrice:  prod.ListPrice,
+		UnitFactor: unitFactor,
 	}
 }
 

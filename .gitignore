@@ -8,3 +8,9 @@
 *.exe
 
 .vscode
+
+# Local price history database
+data/
+*.db
+*.db-shm
+*.db-wal

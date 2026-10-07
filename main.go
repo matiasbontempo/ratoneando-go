@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"ratoneando/config"
+	"ratoneando/history"
 	"ratoneando/middlewares"
 	"ratoneando/routes"
 	"ratoneando/utils/cache"
@@ -14,6 +15,7 @@ func main() {
 	logger.Init()
 	config.Init()
 	cache.Init()
+	history.Init()
 
 	gin.SetMode(config.ENV)
 
