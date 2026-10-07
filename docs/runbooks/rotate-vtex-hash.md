@@ -50,14 +50,9 @@ The hash is read from the `VTEX_SHA256_HASH` env variable (`config/config.go`). 
 
 ## 4. Update production (Railway)
 
-Project `ratoneando.ar`, environment `production`, service `ratoneando-go`.
-
-| Item | ID |
-|---|---|
-| Project | `c1918701-9433-44fc-90bc-5fe6376fe1d1` |
-| Environment (production) | `5926e54d-7a5d-4e4a-9177-8a420bee5ce4` |
-| Service `ratoneando-go` | `a24648b7-59e4-4e82-afc3-63c9753bd86a` |
-| Service `Redis` | `d44a4480-f20a-4389-b190-b3ce1249afb7` |
+Project `ratoneando.ar`, environment `production`, service `ratoneando-go` (Redis is a separate
+service in the same project). The Railway IDs are not stored in this repo. Find them with
+`railway status` or in the dashboard URL, or ask Claude Code to list them through the Railway MCP.
 
 Dashboard: set `VTEX_SHA256_HASH` on `ratoneando-go`.
 CLI: `railway variables --set VTEX_SHA256_HASH=<new-hash> -s ratoneando-go`.
