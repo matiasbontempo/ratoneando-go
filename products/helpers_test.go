@@ -32,3 +32,18 @@ func TestFuzzyDropsUnrelatedProducts(t *testing.T) {
 		t.Fatalf("expected no match, got %v", names(got))
 	}
 }
+
+func TestFuzzyKeepsNearlyIdenticalNames(t *testing.T) {
+	list := []Schema{
+		{ID: "1", Name: "Oreo"},
+		{ID: "2", Name: "Leche 1L"},
+		{ID: "3", Name: "Leche Entera La Serenisima 1 L"},
+	}
+
+	if got := Fuzzy(list, "oreo"); len(got) != 1 {
+		t.Fatalf("expected the exact name to be kept, got %v", names(got))
+	}
+	if got := Fuzzy(list, "leche"); len(got) != 2 {
+		t.Fatalf("expected both milk products, got %v", names(got))
+	}
+}
