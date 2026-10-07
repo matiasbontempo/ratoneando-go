@@ -19,6 +19,9 @@ var (
 	VTEX_SHA256_HASH          = "REPLACE_ME"
 	HISTORY_ENABLED           = false
 	HISTORY_DB_PATH           = "./data/history.db"
+	HISTORY_WINDOW_DAYS       = 60
+	HISTORY_MIN_POINTS        = 5
+	HISTORY_MIN_SPAN_DAYS     = 14
 )
 
 func getEnv(key, defaultValue string) string {
@@ -45,4 +48,7 @@ func Init() {
 	VTEX_SHA256_HASH = getEnv("VTEX_SHA256_HASH", "REPLACE_ME")
 	HISTORY_ENABLED = getEnv("HISTORY_ENABLED", "false") == "true"
 	HISTORY_DB_PATH = getEnv("HISTORY_DB_PATH", "./data/history.db")
+	HISTORY_WINDOW_DAYS, _ = strconv.Atoi(getEnv("HISTORY_WINDOW_DAYS", "60"))
+	HISTORY_MIN_POINTS, _ = strconv.Atoi(getEnv("HISTORY_MIN_POINTS", "5"))
+	HISTORY_MIN_SPAN_DAYS, _ = strconv.Atoi(getEnv("HISTORY_MIN_SPAN_DAYS", "14"))
 }

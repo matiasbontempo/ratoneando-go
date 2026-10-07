@@ -79,7 +79,8 @@ type suspect struct {
 }
 
 type Store struct {
-	db       *sql.DB
+	db       *sql.DB // single connection, used for writes
+	readDB   *sql.DB // several connections, query-only, used by the API
 	path     string
 	now      func() time.Time
 	mu       sync.Mutex
@@ -105,8 +106,16 @@ func Open(path string) (*Store, error) {
 		return nil, fmt.Errorf("creating history schema: %w", err)
 	}
 
+	readDB, err := sql.Open("sqlite", dsn+"&_pragma=query_only(1)")
+	if err != nil {
+		db.Close()
+		return nil, fmt.Errorf("opening history read handle: %w", err)
+	}
+	readDB.SetMaxOpenConns(4)
+
 	return &Store{
 		db:       db,
+		readDB:   readDB,
 		path:     path,
 		now:      time.Now,
 		suspects: map[string]suspect{},
@@ -114,6 +123,7 @@ func Open(path string) (*Store, error) {
 }
 
 func (s *Store) Close() error {
+	s.readDB.Close()
 	return s.db.Close()
 }
 

@@ -29,7 +29,7 @@ func NormalizedScraper(c *gin.Context) {
 	}
 
 	// Check if the request is coming from a valid source
-	if config.ENV == "release" && (referer == "" || !strings.Contains(referer, config.WEB_URL)) {
+	if !isAllowedReferer(referer) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden."})
 		return
 	}
@@ -126,6 +126,7 @@ func NormalizedScraper(c *gin.Context) {
 	filteredProducts := products.Fuzzy(normalizedProducts, query)
 	history.Record(filteredProducts)
 	sortedProducts := products.Sort(filteredProducts)
+	history.Annotate(sortedProducts)
 
 	response := gin.H{
 		"products":       sortedProducts,

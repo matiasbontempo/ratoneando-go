@@ -36,11 +36,56 @@ func Init() {
 		return
 	}
 
-	recorder = &Recorder{store: store, queue: make(chan []Item, 64)}
-	go recorder.run()
+	start(store)
 	go recorder.runBackups()
 
 	logger.Log("Price history enabled: " + config.HISTORY_DB_PATH)
+}
+
+// start installs the store and starts the writer goroutine. Tests use it with a temporary store.
+func start(store *Store) {
+	recorder = &Recorder{store: store, queue: make(chan []Item, 64)}
+	go recorder.run()
+}
+
+// UseStore enables history on an already opened store, without a database path or backups.
+// It exists for tests of the packages that read history.
+func UseStore(store *Store) {
+	start(store)
+}
+
+// Active returns the store when history is enabled, or nil.
+func Active() *Store {
+	if recorder == nil {
+		return nil
+	}
+	return recorder.store
+}
+
+// Annotate adds a history summary to the products that have enough data. It never fails a
+// search: on any error the products are left as they are.
+func Annotate(shown []products.Schema) {
+	store := Active()
+	if store == nil || len(shown) == 0 {
+		return
+	}
+
+	keys := make([]Key, len(shown))
+	for i, product := range shown {
+		keys[i] = Key{Source: product.Source, ID: product.ID, Price: product.Price}
+	}
+
+	summaries, err := store.Summaries(keys)
+	if err != nil {
+		logger.LogError("Price history read failed: " + err.Error())
+		return
+	}
+	for i, key := range keys {
+		if summary, ok := summaries[key]; ok {
+			s := summary
+			shown[i].History = &s
+		}
+	}
 }
 
 func (r *Recorder) run() {

@@ -10,6 +10,7 @@ func RegisterRoutes(router *gin.Engine) {
 	// Register the routes
 	router.GET("/", controllers.NormalizedScraper)
 	router.GET("/raw", controllers.NormalizedScraper)
+	router.GET("/history", controllers.PriceHistory)
 
 	// Health check route
 	router.GET("/health", func(c *gin.Context) {
