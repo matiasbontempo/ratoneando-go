@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"ratoneando/config"
+	"ratoneando/history"
 	"ratoneando/products"
 	"ratoneando/scrapers"
 	"ratoneando/utils/cache"
@@ -123,6 +124,7 @@ func NormalizedScraper(c *gin.Context) {
 	}
 
 	filteredProducts := products.Fuzzy(normalizedProducts, query)
+	history.Record(filteredProducts)
 	sortedProducts := products.Sort(filteredProducts)
 
 	response := gin.H{
