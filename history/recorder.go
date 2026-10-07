@@ -9,7 +9,10 @@ import (
 	"ratoneando/utils/logger"
 )
 
-const backupInterval = 24 * time.Hour
+const (
+	backupInterval     = 24 * time.Hour
+	startupBackupDelay = time.Minute
+)
 
 var recorder *Recorder
 
@@ -55,13 +58,21 @@ func (r *Recorder) run() {
 }
 
 func (r *Recorder) runBackups() {
-	ticker := time.NewTicker(backupInterval)
-	defer ticker.Stop()
-
-	for range ticker.C {
+	backup := func() {
 		if err := r.store.Backup(); err != nil {
 			logger.LogError("Price history backup failed: " + err.Error())
 		}
+	}
+
+	// A first copy shortly after start, so there is a consistent file to download even if the
+	// service is redeployed more often than once a day.
+	time.Sleep(startupBackupDelay)
+	backup()
+
+	ticker := time.NewTicker(backupInterval)
+	defer ticker.Stop()
+	for range ticker.C {
+		backup()
 	}
 }
 

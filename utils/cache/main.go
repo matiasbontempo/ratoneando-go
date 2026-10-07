@@ -14,11 +14,12 @@ var (
 )
 
 func Init() {
-	logger.Log(config.REDIS_URL)
 	opts, err := redis.ParseURL(config.REDIS_URL)
 	if err != nil {
 		logger.LogFatal("Error parsing Redis URL")
 	}
+	// Only the address: the URL carries the password and must never reach the logs.
+	logger.Log("Redis: " + opts.Addr)
 
 	client := redis.NewClient(opts)
 
