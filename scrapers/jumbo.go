@@ -33,6 +33,22 @@ type ResponseProduct struct {
 type ProductData struct {
 	MeasurementUnitUn string  `json:"MeasurementUnit"`
 	UnitMultiplierUn  float64 `json:"UnitMultiplier"`
+
+	// The real key in Jumbo's JSON is "measurement_unit". "kg" marks products sold by weight (meat, cold cuts,
+	// cheese): their price is per kilo, whatever weight the name mentions ("100 Grs" is the slice size).
+	SoldBy string `json:"measurement_unit"`
+}
+
+// storeUnit is the unit Jumbo itself declares for the price. Only weight-sold products have one: for the rest the
+// size has to be read from the name.
+func storeUnit(data ProductData) string {
+	if data.MeasurementUnitUn != "" {
+		return data.MeasurementUnitUn
+	}
+	if data.SoldBy == "kg" {
+		return "KG"
+	}
+	return ""
 }
 
 type RawProduct struct {
@@ -83,7 +99,7 @@ func Jumbo(query string) ([]products.Schema, error) {
 				Unavailable: !rawProduct.Items[0].Sellers[0].CommertialOffer.IsAvailable,
 				Price:       rawProduct.Items[0].Sellers[0].CommertialOffer.Price,
 				ListPrice:   rawProduct.Items[0].Sellers[0].CommertialOffer.ListPrice,
-				Unit:        rawProduct.MeasurementUnitUn,
+				Unit:        storeUnit(rawProduct.ProductData),
 				UnitFactor:  rawProduct.UnitMultiplierUn,
 			}
 		},
