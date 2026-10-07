@@ -11,7 +11,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"ratoneando/config"
 	"ratoneando/history"
 	"ratoneando/products"
 	"ratoneando/scrapers"
@@ -55,7 +54,7 @@ func NormalizedScraper(c *gin.Context) {
 		response := gin.H{}
 		json.Unmarshal([]byte(cacheResponse), &response)
 
-		c.Header("Cache-Control", "public, max-age="+config.RESPONSE_CACHE_EXPIRATION)
+		c.Header("Cache-Control", hitCacheControl(response))
 		c.Header("X-Cache", "HIT")
 
 		c.JSON(http.StatusOK, response)
@@ -136,7 +135,7 @@ func NormalizedScraper(c *gin.Context) {
 	// Cache the response
 	stringifiedResponse, _ := json.Marshal(response)
 
-	cache.Set(query, string(stringifiedResponse), config.REDIS_CACHE_EXPIRATION)
+	cache.Set(query, string(stringifiedResponse), cacheExpiration(failedScrappers))
 
 	// Return the products
 	c.JSON(http.StatusOK, response)
