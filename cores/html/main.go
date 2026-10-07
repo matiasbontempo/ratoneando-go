@@ -1,7 +1,7 @@
 package html
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 	"net/url"
 
@@ -27,14 +27,14 @@ func Core(props CoreProps) ([]products.Schema, error) {
 	resp, err := http.Get(searchUrl)
 	if err != nil {
 		logger.LogError("Failed to fetch the URL: " + escapedQuery + "@" + props.Source)
-		return nil, fmt.Errorf(props.Source)
+		return nil, errors.New(props.Source)
 	}
 	defer resp.Body.Close()
 
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
 		logger.LogError("Failed to parse the response body: " + escapedQuery + "@" + props.Source)
-		return nil, fmt.Errorf(props.Source)
+		return nil, errors.New(props.Source)
 	}
 
 	if props.Raw {

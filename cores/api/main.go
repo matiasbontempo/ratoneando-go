@@ -2,7 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -19,21 +19,21 @@ func Core[ResponseStructure any, RawProduct any](props CoreProps[ResponseStructu
 	resp, err := http.Get(searchUrl)
 	if err != nil {
 		logger.LogError("Failed to fetch the URL: " + escapedQuery + "@" + props.Source)
-		return nil, fmt.Errorf(props.Source)
+		return nil, errors.New(props.Source)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		logger.LogError("Failed to read the response body: " + escapedQuery + "@" + props.Source)
-		return nil, fmt.Errorf(props.Source)
+		return nil, errors.New(props.Source)
 	}
 
 	var responseStructure ResponseStructure
 	err = json.Unmarshal(body, &responseStructure)
 	if err != nil {
 		logger.LogError("Failed to unmarshal the response body: " + escapedQuery + "@" + props.Source)
-		return nil, fmt.Errorf(props.Source)
+		return nil, errors.New(props.Source)
 	}
 
 	var errorCheck struct {
@@ -47,7 +47,7 @@ func Core[ResponseStructure any, RawProduct any](props CoreProps[ResponseStructu
 	}
 	if err := json.Unmarshal(body, &errorCheck); err == nil && len(errorCheck.Errors) > 0 {
 		logger.LogError("API returned error: " + errorCheck.Errors[0].Message + " for " + escapedQuery + "@" + props.Source)
-		return nil, fmt.Errorf(props.Source)
+		return nil, errors.New(props.Source)
 	}
 
 	normalizedProducts := props.Normalizer(responseStructure)
