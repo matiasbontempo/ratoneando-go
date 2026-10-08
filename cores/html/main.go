@@ -2,13 +2,13 @@ package html
 
 import (
 	"errors"
-	"net/http"
 	"net/url"
 
 	"github.com/PuerkitoBio/goquery"
 
 	"ratoneando/products"
 	"ratoneando/unit"
+	"ratoneando/utils/httpclient"
 	"ratoneando/utils/logger"
 )
 
@@ -24,7 +24,7 @@ func Core(props CoreProps) ([]products.Schema, error) {
 	escapedQuery := url.PathEscape(props.Query)
 	searchUrl := props.BaseUrl + props.SearchPattern(escapedQuery)
 
-	resp, err := http.Get(searchUrl)
+	resp, err := httpclient.Client.Get(searchUrl)
 	if err != nil {
 		logger.LogError("Failed to fetch the URL: " + escapedQuery + "@" + props.Source)
 		return nil, errors.New(props.Source)
