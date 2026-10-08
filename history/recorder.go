@@ -2,6 +2,7 @@ package history
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"ratoneando/config"
@@ -36,10 +37,35 @@ func Init() {
 		return
 	}
 
+	purgeConfiguredSources(store)
+
 	start(store)
 	go recorder.runBackups()
 
 	logger.Log("Price history enabled: " + config.HISTORY_DB_PATH)
+}
+
+// purgeConfiguredSources runs the one-off cleanup asked for with HISTORY_PURGE_SOURCES.
+func purgeConfiguredSources(store *Store) {
+	var sources []string
+	for _, source := range strings.Split(config.HISTORY_PURGE_SOURCES, ",") {
+		if source = strings.TrimSpace(source); source != "" {
+			sources = append(sources, source)
+		}
+	}
+	if len(sources) == 0 {
+		return
+	}
+
+	observations, skus, err := store.PurgeSources(sources)
+	if err != nil {
+		logger.LogError("Price history purge failed: " + err.Error())
+		return
+	}
+	logger.Log(fmt.Sprintf(
+		"Price history purged for %s: %d products, %d readings. Unset HISTORY_PURGE_SOURCES.",
+		strings.Join(sources, ", "), skus, observations,
+	))
 }
 
 // start installs the store and starts the writer goroutine. Tests use it with a temporary store.

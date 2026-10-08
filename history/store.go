@@ -6,6 +6,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -229,6 +230,44 @@ func (s *Store) Record(items []Item) (Result, error) {
 	}
 
 	return result, tx.Commit()
+}
+
+// PurgeSources deletes every recorded product and reading of the given sources. It exists to
+// clean up after a scraper was recording the wrong store's products under a source name.
+func (s *Store) PurgeSources(sources []string) (observations, skus int64, err error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	tx, err := s.db.Begin()
+	if err != nil {
+		return 0, 0, err
+	}
+	defer tx.Rollback()
+
+	for _, source := range sources {
+		result, err := tx.Exec(`DELETE FROM observation WHERE source = ?`, source)
+		if err != nil {
+			return 0, 0, err
+		}
+		deleted, _ := result.RowsAffected()
+		observations += deleted
+
+		result, err = tx.Exec(`DELETE FROM sku WHERE source = ?`, source)
+		if err != nil {
+			return 0, 0, err
+		}
+		deleted, _ = result.RowsAffected()
+		skus += deleted
+
+		// Forget readings held back as suspicious for this source.
+		for key := range s.suspects {
+			if strings.HasPrefix(key, source+"|") {
+				delete(s.suspects, key)
+			}
+		}
+	}
+
+	return observations, skus, tx.Commit()
 }
 
 // Backup writes a clean, consistent copy of the database next to it. Railway's volume backups

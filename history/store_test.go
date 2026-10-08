@@ -230,3 +230,41 @@ func TestBackupProducesAReadableCopy(t *testing.T) {
 		t.Fatalf("expected the backup to contain the observation, got %d (%v)", n, err)
 	}
 }
+
+func TestPurgeSourcesDeletesOnlyTheNamedSources(t *testing.T) {
+	ts := newTestStore(t)
+	other := item(1000)
+	other.Source = "vea"
+	keep := item(1000)
+	keep.Source = "jumbo"
+	record(t, ts, item(1000), other, keep)
+	ts.advance(time.Hour)
+	record(t, ts, item(1100), other)
+
+	observations, skus, err := ts.PurgeSources([]string{"disco", "vea"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if skus != 2 || observations != 3 {
+		t.Fatalf("expected 2 products and 3 readings deleted, got %d and %d", skus, observations)
+	}
+	if ts.count(t, "SELECT COUNT(*) FROM sku WHERE source = 'jumbo'") != 1 ||
+		ts.count(t, "SELECT COUNT(*) FROM observation WHERE source = 'jumbo'") != 1 {
+		t.Fatal("the other source must be left alone")
+	}
+	if ts.count(t, "SELECT COUNT(*) FROM observation WHERE source IN ('disco','vea')") != 0 {
+		t.Fatal("expected nothing left for the purged sources")
+	}
+}
+
+func TestPurgeWithNoMatchingSourceDoesNothing(t *testing.T) {
+	ts := newTestStore(t)
+	record(t, ts, item(1000))
+
+	observations, skus, err := ts.PurgeSources([]string{"nowhere"})
+
+	if err != nil || observations != 0 || skus != 0 || ts.observations(t) != 1 {
+		t.Fatalf("unexpected purge result: %d %d %v", observations, skus, err)
+	}
+}
