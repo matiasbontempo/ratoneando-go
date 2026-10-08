@@ -13,7 +13,5 @@ func RegisterRoutes(router *gin.Engine) {
 	router.GET("/history", controllers.PriceHistory)
 
 	// Health check route
-	router.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{"status": "ok"})
-	})
+	router.GET("/health", controllers.Health)
 }
