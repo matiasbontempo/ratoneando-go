@@ -1,7 +1,12 @@
 # Spec: Price History and the Ratoneando Inflation Index
 
-Status: draft for review. Nothing here is built yet, except a UI mock of the price-history badge and
-sheet (`ratoneando-web`, branch `feat/price-history-mock`, behind `VITE_PRICE_HISTORY_MOCK`).
+Status (2026-10-07):
+- **Recording is live in production** (PR #9, #10): SQLite on a Railway volume at `/data`,
+  `HISTORY_ENABLED=true`.
+- **Serving history is built but not merged**: search summaries and `GET /history` (Go branch
+  `feat/history-api`), and the UI wired to it behind `VITE_PRICE_HISTORY` (web branch
+  `feat/price-history-api`).
+- The index (Part B) is not built. The basket needs the unit-price audit first.
 
 Items marked **[Decision]** need an answer from the owner. Items marked **[Estimate]** are rough
 guesses, not measurements.
@@ -155,17 +160,14 @@ startup, the API starts with history disabled.
   WAL mode, single writer goroutine fed by a channel.
 - **Where:** a Railway volume attached to the API service (mounted outside `/app`, e.g. `/data`).
   Volumes are mounted when the container starts, not at build time.
-- **Backup:** Railway's own scheduled volume backups. Per the Railway docs, they cover any data on a
-  volume, SQLite included, run daily / weekly / monthly (daily kept 6 days, weekly 27, monthly 89),
-  and are incremental. That means up to about 24 hours of observations could be lost on a restore,
-  which is acceptable because history keeps being recollected going forward. To make sure each
-  snapshot holds a consistent database, a job writes a clean copy with `VACUUM INTO` to the volume
-  every night, shortly before the backup. Backups restore only into the same project and
-  environment, and **wiping a volume deletes all of its backups**, so never wipe it.
-  Litestream to Cloudflare R2 (continuous, off-platform) remains an option if 24 hours of loss or
-  platform lock-in becomes a concern.
-- **Plan availability:** the backup docs page I read does not mention plan restrictions. Verify that
-  scheduled backups are enabled on the current plan before relying on them.
+- **Backup (decided):** Railway's scheduled volume backups are **Pro-plan only**, so they are not
+  available on the current Hobby plan. Instead the app writes a consistent copy with `VACUUM INTO`
+  to `<db>.backup` one minute after every start and then every 24 hours, and the owner downloads it
+  by hand: `railway volume files download /history.db.backup ./history-backup.db`. That copy sits
+  on the same volume, so it protects against corruption, not against losing the volume, which is
+  why the manual download matters. **Wiping a volume deletes it and any platform backups**, so
+  never wipe it. A daily upload to Cloudflare R2, or Litestream, remains an option if manual
+  downloads become a burden.
 - **Size [Estimate]:** an observation is tens of bytes. 10,000 tracked SKUs changing roughly weekly
   is about 500,000 rows per year, around 30 MB. Railway bills volumes by the storage actually
   used (documented at $0.15 per GB per month), so this is pennies.
@@ -185,41 +187,52 @@ startup, the API starts with history disabled.
 
 ### 4.4 API
 
-**Search response.** Each product may gain an optional `history` summary, computed at response
-build time and therefore cached with the response (up to 8 hours stale, which is acceptable):
+**Search response (implemented).** Each product may gain an optional `history` summary, computed
+when the response is built (so it is cached with the response, up to 8 hours stale):
 
 ```json
 {
   "id": "676752", "source": "carrefour", "price": 1939, "...": "...",
   "history": {
     "points": 41,
-    "windowDays": 60,
+    "windowDays": 46,
     "typical": 2272,
     "low": 1799,
     "high": 2392,
-    "changePct": -13.2
+    "changePct": -13.2,
+    "changeDays": 30
   }
 }
 ```
 
 Definitions:
-- `typical`: median of daily prices over the window. Daily price = last known price on that day
-  (carry forward between observations).
-- `low` / `high`: min and max over the window.
-- `changePct`: change versus the price 30 days ago, in percent.
-- `points`: number of stored observations in the window. The UI hides everything below 5.
-- The field is omitted when the SKU has no history.
+- The series is one price per UTC day over the last `HISTORY_WINDOW_DAYS` (default 60), carrying
+  the last known price forward across days with no new reading. Days before the first known
+  price are left out, so `windowDays` is the number of days actually covered.
+- Today's point uses the price being shown right now, not the last stored one.
+- `typical`: median of the daily series. `low` / `high`: min and max.
+- `changePct`: change in percent between today and `changeDays` days ago, where `changeDays` is
+  `min(30, days since the product was first seen)`. A young history therefore compares over a
+  shorter period and says so.
+- `points`: stored observations inside the window.
+- The object is **omitted** unless there are at least `HISTORY_MIN_POINTS` (default 5)
+  observations and the product was first seen at least `HISTORY_MIN_SPAN_DAYS` (default 14) days ago.
+- The summary is read through a separate query-only connection pool; any error leaves the product
+  without a summary and never fails the search.
 
-**History endpoint (for the chart).** `GET /history?source=&id=` returns the daily series for one SKU
-(`[{ "d": "2026-09-01", "p": 1850 }, ...]`), cacheable for an hour. The mock currently embeds the
-series in the search response; the real API should serve it lazily so search payloads stay small.
+**History endpoint (implemented).** `GET /history?source=&id=[&days=]` returns
+`{ "source", "id", "name", "series": [{ "d": "2026-09-01", "p": 1850 }, ...] }`, `days` from 2 to
+180 (default the window). It sends `Cache-Control: public, max-age=3600`, applies the same referer
+rule as search in release mode, and answers 400 for bad parameters and 404 for unknown products or
+when history is disabled. The web app fetches it only when the detail sheet opens.
 
 ### 4.5 User experience
 
 - Search itself is unchanged: same input, same spinner, same order (unit price by default).
 - **Badges.** A product shows a small badge only when it is worth mentioning:
   - at or near its lowest price in the window and clearly below typical: "Precio más bajo en N semanas";
-  - price change of at least 8% over the last month: "▼ X% vs. el último mes" or "▲ X% este mes".
+  - price change of at least 8%: "▼ X% vs. el último mes" / "▲ X% este mes" for a full month of
+    comparison, or "▼ X% en N días" / "▲ X% en N días" while the history is younger.
 - **At most 3 badges per search**, ranked by size of the move; "lowest in weeks" outranks a plain drop.
 - **Detail sheet** on tapping a badge: chart (about 60 days), low / typical / high, a note that
   prices exclude card, wallet and in-store promotions, and a link to the store.
@@ -230,9 +243,12 @@ series in the search response; the real API should serve it lazily so search pay
 
 ### 4.6 Flags and configuration
 
-- Backend: `HISTORY_ENABLED` (record and serve), `HISTORY_DB_PATH`.
-- Frontend: `VITE_PRICE_HISTORY_MOCK` exists today (fake data). A real flag will replace it once the
-  API serves history.
+- Backend: `HISTORY_ENABLED` (record and serve), `HISTORY_DB_PATH`, `HISTORY_WINDOW_DAYS` (60),
+  `HISTORY_MIN_POINTS` (5), `HISTORY_MIN_SPAN_DAYS` (14), `PARTIAL_CACHE_EXPIRATION` (60 s, how long
+  a response with failed stores stays cached).
+- Frontend: `VITE_PRICE_HISTORY` shows badges and the sheet from API data; with it off the UI
+  ignores the `history` objects the API sends. `VITE_PRICE_HISTORY_MOCK` replaces them with fake
+  data for design work.
 
 ### 4.7 Metrics (via the existing PostHog setup)
 

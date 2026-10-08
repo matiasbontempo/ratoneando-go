@@ -8,7 +8,7 @@ import (
 func Vea(query string) ([]products.Schema, error) {
 	return vtex.Core(vtex.CoreProps{
 		Query:   query,
-		BaseUrl: "https://www.jumbo.com.ar",
+		BaseUrl: "https://www.vea.com.ar",
 		Source:  "vea",
 	})
 }

@@ -1,5 +1,17 @@
 package products
 
+// PriceHistory is a small summary of how a product's price has moved. It is only present when
+// there is enough data to say something.
+type PriceHistory struct {
+	Points     int     `json:"points"`
+	WindowDays int     `json:"windowDays"`
+	Typical    float64 `json:"typical"`
+	Low        float64 `json:"low"`
+	High       float64 `json:"high"`
+	ChangePct  float64 `json:"changePct"`
+	ChangeDays int     `json:"changeDays"`
+}
+
 type Schema struct {
 	ID        string  `json:"id"`
 	Source    string  `json:"source,omitempty"`
@@ -9,6 +21,8 @@ type Schema struct {
 	Price     float64 `json:"price,omitempty"`
 	Unit      string  `json:"unit,omitempty"`
 	UnitPrice float64 `json:"unitPrice,omitempty"`
+
+	History *PriceHistory `json:"history,omitempty"`
 
 	// Internal fields, used to record price history. They are not part of the public response.
 	ListPrice  float64 `json:"-"`

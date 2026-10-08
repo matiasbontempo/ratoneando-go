@@ -11,7 +11,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"ratoneando/config"
 	"ratoneando/history"
 	"ratoneando/products"
 	"ratoneando/scrapers"
@@ -29,7 +28,7 @@ func NormalizedScraper(c *gin.Context) {
 	}
 
 	// Check if the request is coming from a valid source
-	if config.ENV == "release" && (referer == "" || !strings.Contains(referer, config.WEB_URL)) {
+	if !isAllowedReferer(referer) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden."})
 		return
 	}
@@ -55,7 +54,7 @@ func NormalizedScraper(c *gin.Context) {
 		response := gin.H{}
 		json.Unmarshal([]byte(cacheResponse), &response)
 
-		c.Header("Cache-Control", "public, max-age="+config.RESPONSE_CACHE_EXPIRATION)
+		c.Header("Cache-Control", hitCacheControl(response))
 		c.Header("X-Cache", "HIT")
 
 		c.JSON(http.StatusOK, response)
@@ -75,10 +74,10 @@ func NormalizedScraper(c *gin.Context) {
 		// scrapers.Coto,
 		scrapers.DiaOnline,
 		scrapers.Disco,
-		scrapers.Farmacity,
+		// scrapers.Farmacity, // disabled: a pharmacy, not part of the supermarket comparison
 		scrapers.Jumbo,
 		scrapers.MasOnline,
-		scrapers.MercadoLibre,
+		// scrapers.MercadoLibre, // disabled: a marketplace, prices are not comparable
 		scrapers.Vea,
 	}
 
@@ -126,6 +125,7 @@ func NormalizedScraper(c *gin.Context) {
 	filteredProducts := products.Fuzzy(normalizedProducts, query)
 	history.Record(filteredProducts)
 	sortedProducts := products.Sort(filteredProducts)
+	history.Annotate(sortedProducts)
 
 	response := gin.H{
 		"products":       sortedProducts,
@@ -135,7 +135,7 @@ func NormalizedScraper(c *gin.Context) {
 	// Cache the response
 	stringifiedResponse, _ := json.Marshal(response)
 
-	cache.Set(query, string(stringifiedResponse), config.REDIS_CACHE_EXPIRATION)
+	cache.Set(query, string(stringifiedResponse), cacheExpiration(failedScrappers))
 
 	// Return the products
 	c.JSON(http.StatusOK, response)

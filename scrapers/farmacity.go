@@ -9,6 +9,6 @@ func Farmacity(query string) ([]products.Schema, error) {
 	return vtex.Core(vtex.CoreProps{
 		Query:   query,
 		BaseUrl: "https://www.farmacity.com",
-		Source:  "disco",
+		Source:  "farmacity",
 	})
 }
