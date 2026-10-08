@@ -74,10 +74,10 @@ func NormalizedScraper(c *gin.Context) {
 		// scrapers.Coto,
 		scrapers.DiaOnline,
 		scrapers.Disco,
-		scrapers.Farmacity,
+		// scrapers.Farmacity, // disabled: a pharmacy, not part of the supermarket comparison
 		scrapers.Jumbo,
 		scrapers.MasOnline,
-		scrapers.MercadoLibre,
+		// scrapers.MercadoLibre, // disabled: a marketplace, prices are not comparable
 		scrapers.Vea,
 	}
 
