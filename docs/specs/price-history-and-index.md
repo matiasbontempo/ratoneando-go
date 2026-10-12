@@ -280,8 +280,8 @@ It is named "Índice Ratoneando" and never presented as official.
 - For each store, each item is **frozen to one SKU** chosen at the base date. **[Decision: how to
   choose. Proposed: the first result for a fixed query in that store, reviewed by hand once.]**
   Freezing prevents the sample from drifting with popularity.
-- A store may lack an item. An item counts only if at least **3 of the 6 supermarket chains** carry it. The index uses only the
-  chains the app currently shows to users (Carrefour, Disco, Jumbo, Vea, Día, MasOnline). Farmacity
+- A store may lack an item. An item counts only if at least **3 of the 7 supermarket chains** carry it. The index uses only the
+  chains the app currently shows to users (Carrefour, Coto, Disco, Jumbo, Vea, Día, MasOnline). Farmacity
   and MercadoLibre are excluded: a pharmacy and a marketplace are not comparable shelves.
 - If a frozen SKU disappears for more than 14 days, replace it with the closest equivalent in that
   store and record the replacement date. The replacement is linked into the series (its first
@@ -319,7 +319,7 @@ It is named "Índice Ratoneando" and never presented as official.
 - Online prices may differ from branch prices, and by region. Region handling is not verified.
 - Equal weights are not a household spending pattern. Weighting by INDEC expenditure shares is a
   possible later improvement.
-- Six chains are not the whole market.
+- Seven chains are not the whole market.
 
 ### 5.6 Implementation notes
 

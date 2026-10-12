@@ -3,10 +3,8 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -65,51 +63,18 @@ func NormalizedScraper(c *gin.Context) {
 	// Middlewares
 	// TODO
 
-	// Run the scrapers
-	var wg sync.WaitGroup
-	var mu sync.Mutex
-
-	scrappers := []func(string) ([]products.Schema, error){
-		scrapers.Carrefour,
-		scrapers.Coto,
-		scrapers.DiaOnline,
-		scrapers.Disco,
-		// scrapers.Farmacity, // disabled: a pharmacy, not part of the supermarket comparison
-		scrapers.Jumbo,
-		scrapers.MasOnline,
-		// scrapers.MercadoLibre, // disabled: a marketplace, prices are not comparable
-		scrapers.Vea,
-	}
-
-	type result struct {
-		Products []products.Schema
-		Error    error
-	}
-
-	results := make([]result, len(scrappers))
-
-	for i, scrapper := range scrappers {
-		wg.Add(1)
-		go func(i int, scrapper func(string) ([]products.Schema, error)) {
-			defer wg.Done()
-			defer func() {
-				if r := recover(); r != nil {
-					log.Printf("Recovered from panic in scraper: %v", r)
-				}
-			}()
-
-			products, err := scrapper(query)
-			if err != nil {
-				log.Printf("Error executing scraper: %v", err)
-			}
-
-			mu.Lock()
-			results[i] = result{Products: products, Error: err}
-			mu.Unlock()
-		}(i, scrapper)
-	}
-
-	wg.Wait()
+	// Run the scrapers. The source is the name that shows up in failedScrapers.
+	results := runScrapers([]scraper{
+		{"carrefour", scrapers.Carrefour},
+		{"coto", scrapers.Coto},
+		{"diaonline", scrapers.DiaOnline},
+		{"disco", scrapers.Disco},
+		// {"farmacity", scrapers.Farmacity}, // disabled: a pharmacy, not part of the supermarket comparison
+		{"jumbo", scrapers.Jumbo},
+		{"masonline", scrapers.MasOnline},
+		// {"mercadolibre", scrapers.MercadoLibre}, // disabled: a marketplace, prices are not comparable
+		{"vea", scrapers.Vea},
+	}, query)
 
 	var failedScrappers []string
 	var normalizedProducts []products.Schema
