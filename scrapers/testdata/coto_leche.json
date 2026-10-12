@@ -1,0 +1,71 @@
+{
+  "contents": [
+    {
+      "Main": [
+        {
+          "@type": "Category_MediaBanner",
+          "name": "Media Banner top",
+          "externo": true,
+          "imageURL": ""
+        },
+        {
+          "@type": "Category_SearchAdjustments",
+          "originalTerms": ["leche"],
+          "name": "Search Adjustments"
+        },
+        {
+          "templateTypes": ["MainLandingPage"],
+          "contents": [
+            {
+              "@type": "Category_ResultsList",
+              "name": "Listado General Productos",
+              "totalNumRecs": 595,
+              "records": [
+                {
+                  "detailsAction": {
+                    "recordState": "/leche-parcialmente-descremada-liviana-larga-vida-la-serenisima-1l/_/A-00253104-00253104-200?format=json"
+                  },
+                  "attributes": {
+                    "product.displayName": ["Leche Parcialmente Descremada Liviana Larga Vida LA SERENISIMA 1l"],
+                    "product.repositoryId": ["prod00253104"]
+                  },
+                  "records": [
+                    {
+                      "attributes": {
+                        "sku.referencePrice": ["3060.000000"],
+                        "sku.activePrice": ["3060.000000"],
+                        "product.mediumImage.url": ["https://static.cotodigital3.com.ar/sitios/fotos/medium/00253100/00253104.jpg"],
+                        "sku.quantity": ["1"],
+                        "product.dtoDescuentos": ["[]"]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "detailsAction": {
+                    "recordState": "/leche-larga-vida-descremada-las-tres-niñas-1l/_/A-00257444-00257444-200?format=json"
+                  },
+                  "attributes": {
+                    "product.displayName": ["Leche Larga Vida Descremada LAS TRES NIÑAS 1l"],
+                    "product.repositoryId": ["prod00257444"]
+                  },
+                  "records": [
+                    {
+                      "attributes": {
+                        "sku.referencePrice": ["2860.000000"],
+                        "sku.activePrice": ["2860.000000"],
+                        "product.mediumImage.url": ["https://static.cotodigital3.com.ar/sitios/fotos/medium/00257400/00257444.jpg"],
+                        "sku.quantity": ["1"],
+                        "product.dtoDescuentos": ["[{\"id\":\"38358829\",\"textoVigencia\":\" \",\"textoPrecioRegular\":\"Precio Contado: $2860\",\"precioRegular\":\"\",\"textoDescuento\":\"25%Dto\",\"precioDescuento\":\"$2141.28\",\"precioDesc\":\"2141.28\",\"precioDescTextoAdicional\":\"\",\"imagenDescuento\":\" \",\"comentarios\":\" No acumulable con otras promos\"}]"]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
